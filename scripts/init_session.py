@@ -23,7 +23,7 @@ def create_session(build_num="1.0.0-alpha"):
         print(f"\n✅ Session Created Successfully!")
         print(f"🆔 Session ID: {session_id}")
         print(f"🔗 UI URL:     http://localhost:3000/sessions/{session_id}")
-        print(f"📋 Command:    ./test_ui_update.sh {session_id}")
+        print(f"📋 Command:    ./scripts/test_ui_update.sh {session_id}")
         
         return session_id
         

@@ -191,7 +191,7 @@ VITE_API_URL=http://localhost:8000
 ### MQTT Service
 - **paho.mqtt.golang** - MQTT client for Go
 
-## Testing
+## Automated Testing
 
 ### Prerequisites
 Ensure Docker Compose services are running:
@@ -209,7 +209,7 @@ Instead of clicking through the UI, generate a valid session via the API:
 Create test data
 ```bash
 chmod +x ./scripts/seed_db.sh
-./scripts/seed_dv.sh
+./scripts/seed_db.sh
 ```
 
 Create a test session
