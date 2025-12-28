@@ -31,7 +31,6 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
 	// 1) Registry (in-memory; later swap for Redis/DB-backed)
 	reg := registry.NewMemory()
 
@@ -64,6 +63,30 @@ func main() {
 		LocalTestsRoot: cfg.LocalTestsRoot,
 		Logger:         log.Default(),
 	}, sshc)
+
+	target := os.Getenv("TEST_TARGET_ADDR")
+	if target != "" {
+		// run a single deploy against a fixed host, then exit
+		d := core.Device{
+			DeviceID: "test-target",
+			Product:  os.Getenv("TEST_PRODUCT"),
+			Addr:     target,
+		}
+		plan := os.Getenv("TEST_PLAN")
+		if plan == "" {
+			plan = "smoke"
+		}
+
+		err := run.DeployAndRun(ctx, d, runner.RunCommand{
+			SessionID:   "local-test-session",
+			BuildNumber: "local-build",
+			Plan:        plan,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 
 	// 4) MQTT start-session subscriber
 	mc := mqtt.NewClient(mqtt.NewClientOptions().

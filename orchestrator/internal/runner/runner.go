@@ -83,10 +83,10 @@ func (r *Runner) DeployAndRun(ctx context.Context, d core.Device, cmd RunCommand
 	run := fmt.Sprintf(
 		"bash -lc 'set -euo pipefail; "+
 			"mkdir -p %[1]s; "+
-			"rm -rf %[1]s/*; "+
 			"tar -xzf %[1]s/bundle.tar.gz -C %[1]s; "+
 			"chmod +x %[1]s/start.sh; "+
-			"%[1]s/start.sh --session %q --device %q --build %q --plan %q'",
+			"%[1]s/start.sh --session %q --device %q --build %q --plan %q'"+
+			"rm -rf %[1]s/*; ",
 		r.cfg.RemoteDir, cmd.SessionID, d.DeviceID, cmd.BuildNumber, cmd.Plan,
 	)
 
