@@ -26,6 +26,7 @@ The project uses a microservices architecture with Docker Compose for orchestrat
 
 1. **Clone and navigate to project directory**:
    ```bash
+   git clone https://github.com/arvinsalehi/mock-orchestra.git
    cd /path/to/mock
    ```
 
