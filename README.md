@@ -1,6 +1,6 @@
 # Mock Project
 
-A distributed testing and device orchestration system built with FastAPI, Go, MQTT, and React. This project enables real-time session management, device command execution, and live status monitoring across multiple test targets.
+A distributed testing and device orchestration system built with FastAPI, Go, MQTT, and React. This project enables real-time session management, device command execution, and live status monitoring across multiple test targets. In theory can be used for plug-and-play test bench for multiple products.
 
 ## Architecture Overview
 
@@ -8,7 +8,7 @@ The project uses a microservices architecture with Docker Compose for orchestrat
 
 - **Backend (Python/FastAPI)**: REST API and WebSocket server for session management
 - **Frontend (React/TypeScript)**: Real-time dashboard for monitoring and test execution
-- **MQTT Service (Go)**: Orchestrates device commands via MQTT protocol
+- **Orchestrator (Go)**: Orchestrates device commands via MQTT protocol
 - **Message Broker (Mosquitto)**: MQTT broker for device communication
 - **Redis**: In-memory cache for session data
 - **MongoDB**: Persistent storage for test results and device mappings
@@ -18,7 +18,7 @@ The project uses a microservices architecture with Docker Compose for orchestrat
 - Docker & Docker Compose
 - Node.js 18+ (for local frontend development)
 - Python 3.11+ (for local backend development)
-- Go 1.21+ (for local MQTT service development)
+- Go 1.21+ (for local Orchestrator development)
 
 ## Quick Start
 
@@ -110,6 +110,13 @@ Run the following script.
 ```bash
 ./orechestrator/test-run.payload.sh
 ```
+**Expected Behavior**:
+```bash
+2025/12/28 18:10:16 [mDNS] browsing service=_testbench._tcp domain=local.
+2025/12/28 18:10:16 [Identify] device=test-target product=product_A serial= addr=127.0.0.1:2222
+2025/12/28 18:10:16 [Exec] device=test-target exit=0 err=<nil> output=start.sh ran
+session=--session
+```
 
 ### Local Development
 
@@ -131,7 +138,7 @@ npm install
 npm run dev
 ```
 
-#### MQTT Service Setup
+#### Orchestrator Setup
 
 ```bash
 cd orchestrator
@@ -143,41 +150,39 @@ go run main.go
 
 ```
 .
-├── docker-compose.yml          # Service orchestration
-├── backend/                    # Python FastAPI application
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── app/
-│       ├── main.py            # FastAPI app setup
-│       ├── routes.py          # API endpoints
-│       ├── models.py          # Data models
-│       ├── database.py        # Database connection
-│       ├── connection.py      # WebSocket manager
-│       ├── mqtt_handler.py    # MQTT integration
-│       └── config.py          # Configuration
-├── frontend/                   # React TypeScript application
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── src/
-│       ├── main.tsx           # React entry point
-│       ├── App.tsx            # Main component
-│       ├── api.ts             # API client
-│       ├── types.ts           # TypeScript types
-│       └── components/
-│           ├── LoginForm.tsx
-│           ├── SessionDashboard.tsx
-│           └── TestTable.tsx
-├── orchestrator/               # Go MQTT orchestrator
-│   ├── Dockerfile
-│   ├── main.go                # Device orchestration logic
-│   └── go.mod
-├── mosquitto/                  # MQTT Broker configuration
-│   └── config/
-│       └── mosquitto.conf
-└── scripts/                    # Utility scripts
-    ├── auto_test.sh           # Automated testing
-    └── mock_live_stream.sh     # Test data streaming
+├── backend
+│   ├── app
+│   ├── Dockerfile
+│   └── requirements.txt
+├── docker-compose.ssh-test.yml
+├── docker-compose.yml
+├── frontend
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   └── vite.config.ts
+├── mock-tests
+│   └── product_A
+├── mosquitto
+│   └── config
+├── orchestrator
+│   ├── cmd
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   ├── internal
+│   └── test-run.payload.sh
+├── README.md
+└── scripts
+    ├── init_session.py
+    ├── seed_db.sh
+    ├── ssh-test
+    └── test_ui_update.sh
 ```
 
 ## Key Features
@@ -224,7 +229,7 @@ MQTT_HOST=mosquitto
 MQTT_PORT=1883
 ```
 
-### MQTT Service
+### Orchestrator
 ```
 MQTT_BROKER_URL=tcp://mosquitto:1883
 ```
@@ -253,8 +258,10 @@ VITE_API_URL=http://localhost:8000
 - **tailwindcss** - Styling
 - **vite** - Build tool
 
-### MQTT Service
+### Orchestrator
 - **paho.mqtt.golang** - MQTT client for Go
+- **mDNS** - Device discovery based on RPI avahi service.
+- **crypto** - For ssh client
 
 ### Frontend Dev
 
@@ -313,7 +320,7 @@ docker-compose logs -f mosquitto
 # Backend container
 docker-compose exec backend bash
 
-# MQTT service container
+# Orchestrator container
 docker-compose exec orchestrator /bin/sh
 
 # MongoDB
