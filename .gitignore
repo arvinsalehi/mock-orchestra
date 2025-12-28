@@ -1,0 +1,104 @@
+# --- Python (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.env
+.venv
+
+# Unit Test / Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# --- Node.js / React (Frontend) ---
+node_modules/
+/dist
+.DS_Store
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite / Testing
+coverage/
+.nyc_output/
+
+# --- Go (Orchestrator) ---
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (if using vendor, though go.mod is preferred now)
+vendor/
+
+# --- Docker / Infrastructure ---
+# If you mount local data volumes
+mosquitto/data/*
+!mosquitto/data/.keep
+mosquitto/log/*
+!mosquitto/log/.keep
+postgres_data/
+redis_data/
+
+# Local Environment Variables (Secrets)
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+orchestrator/.env
+
+# IDE / Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+

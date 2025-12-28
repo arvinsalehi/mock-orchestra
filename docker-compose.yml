@@ -1,0 +1,74 @@
+version: '3.8'
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports: 
+      - "1883:1883"  # Broker listens here
+      - "9001:9001"
+    volumes:
+      # Fixed destination path: /mosquitto/config/mosquitto.conf
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    ports: ["8000:8000"]
+    depends_on: 
+      - redis
+      - mongo
+      - mosquitto # Depends on BROKER, not just the go service
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URL=mongodb://mongo:27017
+      # Fixed: Point to the mosquitto container, not mqtt-service
+      - MQTT_HOST=mosquitto 
+      - MQTT_PORT=1883
+    volumes:
+      - ./backend:/app 
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app-network
+
+  mqtt-service:  
+    build: ./mqtt-service
+    # REMOVED PORTS: It's a client, doesn't need to expose 1883
+    environment:
+      # Add this env var so your Go code knows where the broker is
+      - MQTT_BROKER_URL=tcp://mosquitto:1883
+    depends_on:
+      - mosquitto
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+    volumes: 
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    depends_on: 
+      - backend
+    volumes:
+      - ./frontend/src:/app/src  # Sync source code
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
