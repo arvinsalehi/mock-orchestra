@@ -12,7 +12,6 @@ def create_session(build_num="1.0.0-alpha"):
         payload = {
             "build_number": build_num,
             "operator": "Auto-Script",
-            "device_group": "Lab-A" 
         }
         
         response = requests.post(f"{API_URL}/start-test", json=payload)

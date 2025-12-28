@@ -136,15 +136,6 @@ go run main.go
 ### Health & Info
 - `GET /api/health` - Service health check
 
-### Session Management
-- `POST /api/sessions` - Create a new test session
-- `GET /api/sessions/{session_id}` - Get session details
-- `GET /api/sessions` - List all sessions
-
-### Device Management
-- `GET /api/devices` - List all registered devices (Not implemented)
-- `POST /api/devices/{device_id}/command` - Send command to device (Not implemented)
-
 ### WebSocket
 - `WS /ws/{session_hash}` - Real-time session updates
 
@@ -213,11 +204,21 @@ Run the provided testing scripts:
 
 ### 1. Auto-Create a Session (Database Init)
 Instead of clicking through the UI, generate a valid session via the API:
+
+Create test data
+```bash
+chmod +x ./scripts/seed_db.sh
+./scripts/seed_dv.sh
+```
+
+Create a test session
 ```python
-python3 scripts/init_session.py "Build-2025-RC1"
+python3 scripts/init_session.py
 ```
 
 **Output**: Returns a Session UUID and the direct URL to the UI.
+
+Run the script and watch UI for live update.
 ```bash
 chmod +x ./scripts/test_ui_update.sh
 ./scripts/test_ui_update.sh <PASTE_SESSION_UUID_HERE>
@@ -228,8 +229,8 @@ chmod +x ./scripts/test_ui_update.sh
 2. Row "Battery Check" updates to **Passed** (Green).
 3. Row "WiFi Connectivity" appears as **Failed** (Red).
 
-### 2. Simulate Real-Time Test Results
-Verify the React Table updates dynamically by injecting mock MQTT messages:
+### 2. Watch the docker compose logs
+Verify that every connection closes after test session is done.
 
 ### Frontend Dev
 

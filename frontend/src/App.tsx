@@ -9,8 +9,8 @@ const queryClient = new QueryClient();
 const MainContent = () => {
   const { status } = useSession();
   // Render based on state
-  // return status === 'idle' ? <LoginForm /> : <SessionDashboard />; // We can auto navigate to the active test session
-  return <LoginForm />;
+  // There is no status idle in the context, but we use it here to indicate no session
+  return status === 'idle' ? <LoginForm /> : <SessionDashboard />;
 };
 
 export default function App() {
