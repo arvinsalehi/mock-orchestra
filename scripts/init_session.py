@@ -4,7 +4,7 @@ import sys
 # Configuration
 API_URL = "http://localhost:8000/api"
 
-def create_session(build_num="1.0.0-alpha"):
+def create_session(build_num: str) -> str | None:
     print(f"🔨 Creating new Session for Build: {build_num}...")
     
     try:
@@ -32,5 +32,5 @@ def create_session(build_num="1.0.0-alpha"):
         return None
 
 if __name__ == "__main__":
-    build = sys.argv[1] if len(sys.argv) > 1 else "1.0.0-dev"
+    build = sys.argv[1] if len(sys.argv) > 1 else "1.0.0-alpha"
     create_session(build)
