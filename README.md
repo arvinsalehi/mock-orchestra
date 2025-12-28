@@ -41,6 +41,76 @@ The project uses a microservices architecture with Docker Compose for orchestrat
    - API Docs: http://localhost:8000/docs
    - MQTT Broker: localhost:1883
 
+## Functionality Test
+
+### Prerequisites
+Ensure Docker Compose services are running:
+```bash
+docker-compose up -d
+```
+
+### Automated Test Scripts
+
+Follow the provided steps to for desired service:
+
+### 1. Session Creation and Database Init (Backend, Frontend, MQTT)
+Instead of clicking through the UI, generate a valid session via the API:
+
+Create test data
+```bash
+chmod +x ./scripts/seed_db.sh
+./scripts/seed_db.sh
+```
+
+Create a test session
+```python
+python3 scripts/init_session.py
+```
+
+**Output**: Returns a Session UUID and the direct URL to the UI.
+
+Run the script and watch UI for live update.
+```bash
+chmod +x ./scripts/test_ui_update.sh
+./scripts/test_ui_update.sh <PASTE_SESSION_UUID_HERE>
+```
+
+**Expected Behavior**:
+1. Row "Battery Check" appears as **Running** (Yellow).
+2. Row "Battery Check" updates to **Passed** (Green).
+3. Row "WiFi Connectivity" appears as **Failed** (Red).
+
+
+### 2. Go Orchestration
+Create a test key pair + authorized keys in the project root directory.
+```bash
+mkdir -p scripts/ssh-test
+ssh-keygen -t ed25519 -f scripts/ssh-test/id_ed25519 -N ""
+cp scripts/ssh-test/id_ed25519.pub scripts/ssh-test/authorized_keys
+
+```
+
+Bring the rpi mock device up:
+```bash
+docker compose -f docker-compose.ssh-test.yml up -d
+```
+
+Sanity check from the host.
+```bash
+ssh -p 2222 -i scripts/ssh-test/id_ed25519 -o StrictHostKeyChecking=no pi@localhost "whoami"
+```
+
+Make the required scripts executable.
+```bash
+chmod +x ./mock-tests/product_A/smoke/start.sh
+chmod +x ./orechestrator/test-run.payload.sh
+```
+
+Run the following script.
+```bash
+./orechestrator/test-run.payload.sh
+```
+
 ### Local Development
 
 #### Backend Setup
@@ -64,7 +134,7 @@ npm run dev
 #### MQTT Service Setup
 
 ```bash
-cd mqtt-service
+cd orchestrator
 go mod download
 go run main.go
 ```
@@ -98,7 +168,7 @@ go run main.go
 │           ├── LoginForm.tsx
 │           ├── SessionDashboard.tsx
 │           └── TestTable.tsx
-├── mqtt-service/               # Go MQTT orchestrator
+├── orchestrator/               # Go MQTT orchestrator
 │   ├── Dockerfile
 │   ├── main.go                # Device orchestration logic
 │   └── go.mod
@@ -131,11 +201,6 @@ go run main.go
 - MongoDB for long-term storage
 - Redis for caching and session state
 - Structured logging for debugging
-
-## API Endpoints
-
-### Health & Info
-- `GET /api/health` - Service health check
 
 ### WebSocket
 - `WS /ws/{session_hash}` - Real-time session updates
@@ -191,48 +256,6 @@ VITE_API_URL=http://localhost:8000
 ### MQTT Service
 - **paho.mqtt.golang** - MQTT client for Go
 
-## Automated Testing
-
-### Prerequisites
-Ensure Docker Compose services are running:
-```bash
-docker-compose up -d
-```
-
-### Automated Test Scripts
-
-Run the provided testing scripts:
-
-### 1. Auto-Create a Session (Database Init)
-Instead of clicking through the UI, generate a valid session via the API:
-
-Create test data
-```bash
-chmod +x ./scripts/seed_db.sh
-./scripts/seed_db.sh
-```
-
-Create a test session
-```python
-python3 scripts/init_session.py
-```
-
-**Output**: Returns a Session UUID and the direct URL to the UI.
-
-Run the script and watch UI for live update.
-```bash
-chmod +x ./scripts/test_ui_update.sh
-./scripts/test_ui_update.sh <PASTE_SESSION_UUID_HERE>
-```
-
-**Expected Behavior**:
-1. Row "Battery Check" appears as **Running** (Yellow).
-2. Row "Battery Check" updates to **Passed** (Green).
-3. Row "WiFi Connectivity" appears as **Failed** (Red).
-
-### 2. Watch the docker compose logs
-Verify that every connection closes after test session is done.
-
 ### Frontend Dev
 
 #### Run Development Server
@@ -274,17 +297,6 @@ npm run build
 
 ### Performance Testing
 
-#### Load Testing Backend
-```bash
-# Using Apache Bench
-ab -n 1000 -c 10 http://localhost:8000/api/health
-
-# Using wrk (if installed)
-wrk -t4 -c100 -d30s http://localhost:8000/api/health
-```
-
-### Debugging
-
 #### View Container Logs
 ```bash
 # All services
@@ -292,7 +304,7 @@ docker-compose logs -f
 
 # Specific service
 docker-compose logs -f backend
-docker-compose logs -f mqtt-service
+docker-compose logs -f orchestrator
 docker-compose logs -f mosquitto
 ```
 
@@ -302,7 +314,7 @@ docker-compose logs -f mosquitto
 docker-compose exec backend bash
 
 # MQTT service container
-docker-compose exec mqtt-service /bin/sh
+docker-compose exec orchestrator /bin/sh
 
 # MongoDB
 docker-compose exec mongo mongosh

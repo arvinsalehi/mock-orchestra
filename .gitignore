@@ -90,6 +90,7 @@ redis_data/
 backend/.env
 frontend/.env
 orchestrator/.env
+scripts/ssh-test/
 
 # IDE / Editors
 .idea/

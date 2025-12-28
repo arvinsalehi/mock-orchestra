@@ -21,7 +21,6 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - MONGO_URL=mongodb://mongo:27017
-      # Fixed: Point to the mosquitto container, not mqtt-service
       - MQTT_HOST=mosquitto 
       - MQTT_PORT=1883
     volumes:
@@ -30,8 +29,8 @@ services:
     networks:
       - app-network
 
-  mqtt-service:  
-    build: ./mqtt-service
+  orchestrator:  
+    build: ./orchestrator
     # REMOVED PORTS: It's a client, doesn't need to expose 1883
     environment:
       # Add this env var so your Go code knows where the broker is
